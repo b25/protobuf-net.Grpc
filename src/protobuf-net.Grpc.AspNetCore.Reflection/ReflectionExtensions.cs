@@ -45,7 +45,7 @@ namespace ProtoBuf.Grpc.Server
 
             // ReflectionService is designed to be a singleton
             // Explicitly register creating it in DI using descriptors calculated from gRPC endpoints in the app
-            services.TryAddSingleton(serviceProvider =>
+            services.TryAddSingleton<ReflectionService>(serviceProvider =>
             {
                 var binderConfiguration = serviceProvider.GetService<BinderConfiguration>();
                 var endpointDataSource = serviceProvider.GetRequiredService<EndpointDataSource>();

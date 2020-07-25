@@ -286,17 +286,9 @@ namespace ProtoBuf.Grpc.Internal
 
         internal MethodInfo? TryGetClientHelper()
         {
-
             var name = GetClientHelperName();
-            try
-            {
-                if (name == null || !s_reshaper.TryGetValue(name, out var method)) return null;
-                return method.MakeGenericMethod(From, To);
-            }
-            catch (Exception ex)
-            {
-                throw new InvalidOperationException($"Error obtaining client-helper '{name}' (from: '{From?.FullName}', to: '{To?.FullName}'): {ex.Message}", ex);
-            }
+            if (name == null || !s_reshaper.TryGetValue(name, out var method)) return null;
+            return method.MakeGenericMethod(From, To);
         }
 #pragma warning disable CS0618 // Reshape
         static readonly Dictionary<string, MethodInfo> s_reshaper =

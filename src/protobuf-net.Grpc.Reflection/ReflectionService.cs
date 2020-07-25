@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Security.Cryptography.X509Certificates;
 using Google.Protobuf.Reflection;
 using grpc.reflection.v1alpha;
 using Grpc.Core;
@@ -99,7 +102,7 @@ namespace ProtoBuf.Grpc.Reflection
 
             var response = new FileDescriptorResponse();
             response.FileDescriptorProtoes.AddRange(
-                transitiveDependencies.Select(Serialize));
+                transitiveDependencies.Distinct(FileDescriptorProtoComparer.Instance).Select(Serialize));
 
             return response;
         }
@@ -147,12 +150,14 @@ namespace ProtoBuf.Grpc.Reflection
             return memoryStrem.ToArray();
         }
 
-        private class FileDescriptorProtoComparer : IComparer<FileDescriptorProto>
+        private class FileDescriptorProtoComparer : IComparer<FileDescriptorProto>,IEqualityComparer<FileDescriptorProto>
         {
             public static FileDescriptorProtoComparer Instance { get; } = new FileDescriptorProtoComparer();
+          
 
             public int Compare(FileDescriptorProto left, FileDescriptorProto right)
             {
+               
                 if (left.Dependencies.Contains(right.Name))
                 {
                     return 1;
@@ -167,6 +172,16 @@ namespace ProtoBuf.Grpc.Reflection
                 }
 
                 return 1;
+            }
+
+            public bool Equals(FileDescriptorProto x, FileDescriptorProto y)
+            {
+                return string.Compare(x.Name, y.Name, true)==0;
+            }
+
+            public int GetHashCode(FileDescriptorProto obj)
+            {
+                return obj.Name.GetHashCode();
             }
         }
     }

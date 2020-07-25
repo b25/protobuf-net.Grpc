@@ -42,7 +42,13 @@ namespace ProtoBuf.Grpc.Reflection
                 throw new ArgumentException($"Type '{contractType.Name}' is not a service contract", nameof(contractType));
             }
 
-            name = ServiceBinder.GetNameParts(name, contractType, out var package);
+            string package = "";
+            var idx = name!.LastIndexOf('.');
+            if (idx >= 0)
+            {
+                package = name.Substring(0, idx);
+                name = name.Substring(idx + 1);
+            }
             var service = new Service
             {
                 Name = name
